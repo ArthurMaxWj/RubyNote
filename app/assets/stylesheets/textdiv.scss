@@ -1,0 +1,111 @@
+$passiveColor: #eee;
+// $activeColor: mediumvioletred;
+$activeColor: #e91d63;
+
+@mixin partial-cmp {
+  margin: 0;
+  padding: 0;
+  width:100%;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+}
+
+.textdiv {
+  width: 70%;
+  height: 400px;
+
+
+  .codearea {
+    height: 90%;
+    box-sizing: border-box;
+
+    @include partial-cmp;
+
+    outline: 0;
+    resize: none;
+  }
+
+  textarea.previewarea {
+    border-color: #f75d5d;
+
+    @extend .codearea;
+  }
+
+  div.previewarea {
+    @include partial-cmp;
+    border: 1px solid #f75d5d;
+    background-color: white;
+    height: 90%;
+    box-sizing: border-box;
+    padding: 2px;
+  }
+
+  nav {
+    position: relative;
+
+    height: 12%;
+    //. background-color: #555;
+    background-color: #363636;
+    color: $passiveColor;
+
+    @include partial-cmp;
+
+    padding: 3px;
+    box-sizing: border-box;
+  }
+
+  nav .textlogo {
+    font-size: 32px;
+    color: $activeColor;
+
+    //. padding: 5px 2px 2px;
+
+    font-family: 'Kanit', sans-serif; // Google Fonts (italic, 500)
+
+    position: absolute;
+    left: 3px;
+    bottom: 0;
+  }
+
+  nav .eye {
+    transition: color 1s, text-shadow 0.6s, color 0.6s;
+
+    position: absolute;
+    right: 3px;
+    top: 4px;
+
+    padding: 3px;
+    font-size: 26px;
+    cursor: pointer;
+  }
+
+  nav .eye.activated {
+    //. color: $activeColor;
+    color: rgb(255, 26, 198); // more visible/matching than active
+    text-shadow:  0 0 6px;
+    z-index: 2;
+  }
+
+}
+
+.nice::-webkit-scrollbar-track
+{
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #F5F5F5;
+}
+
+.nice-scroll::-webkit-scrollbar
+{
+  width: 9px;
+  background-color: #F5F5F5;
+}
+
+.nice-scroll::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  background-color: #999;
+}
