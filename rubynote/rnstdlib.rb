@@ -6,7 +6,10 @@ module RNStdlib
   end
 
   def enclose(tag, txt = '', &block)
-    l(tag) + txt + block.call + r(tag)
+    txtb = ''
+    txtb = block.call if block_given?
+
+    l(tag) + txt + txtb + r(tag)
   end
 
   def l(txt)
@@ -25,4 +28,5 @@ module RNStdlib
   def codify(txt)
     '<code>' + txt + '</code>'
   end
+
 end

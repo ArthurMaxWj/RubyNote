@@ -75,6 +75,7 @@ class RubyNoteMehanics
 
   def preprocess
     $RN_ENV = $RN_ENV || self # for RNSecurity's 'preapre' (recursive)
+    #$RN_ENV ||= self # for RNSecurity's 'preapre' (recursive)
     instance_exec(@converted, @note_plain) do
       @converted = render_note(@note_plain)
     end
