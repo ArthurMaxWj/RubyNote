@@ -11,7 +11,7 @@ function toggleAjaxThing() {
         inp = $('.textdiv .codearea').val();
 
         $.get( "/preprocess?code=ok", { 'code': inp}, function(data) {
-           $(".textdiv .previewarea").html('<pre>' + data['converted'] + '</pre>');
+           $(".textdiv .previewarea").html(data['converted']);
         }, 'json');
 
         $('.textdiv .previewarea').show();

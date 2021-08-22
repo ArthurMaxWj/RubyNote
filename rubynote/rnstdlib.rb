@@ -1,5 +1,18 @@
 # standard library
 module RNStdlib
+
+  def set_pre(p)
+    return noth if @doc_state[:pre] == p
+
+    if p
+      @doc_state[:pre] = true
+      '<pre>'
+    else
+      @doc_state[:pre] = false
+      '</pre>'
+    end
+  end
+
   # readable escape from parsing interpolation
   def imitate_code(txt)
     "%#{txt};;"
@@ -38,5 +51,51 @@ module RNStdlib
   def codify(txt)
     enclose('code', txt)
   end
+
+  # 'br' tag
+  def br
+    '<br />'
+  end
+
+  module SpacingTools
+
+    def skip
+      @doc_state[:skip_next] = true
+      noth
+    end
+    alias s skip
+
+    def skip_space_start
+      @doc_state[:super_skip] = true
+      @doc_state[:skip_next] = true
+      noth
+    end
+    alias ss skip_space_start
+
+    def skip_space_end
+      @doc_state[:super_skip] = false
+      @doc_state[:skip_next] = false
+      noth
+    end
+    alias se skip_space_end
+
+    def s_br
+      skip
+      br
+    end
+
+    def ss_br
+      skip_space_start
+      br
+    end
+
+    def se_s
+      skip_space_start
+      skip
+      noth
+    end
+
+  end
+  include ::RNStdlib::SpacingTools
 
 end

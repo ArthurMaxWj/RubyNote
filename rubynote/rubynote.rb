@@ -16,10 +16,16 @@ module RNExtensions
     end
   end
 
+  # hides displaying (basically just an internal abstraction for future)
+  def nothing_text
+    nil
+  end
+  alias noth nothing_text
+
   # switches off\on html with :plain\:html
   def docmode(mode)
-    @is_plain = mode == :plain
-    nil # hides displaying
+    @doc_state[:is_plain] = mode == :plain
+    noth # hides displaying
   end
 
 end
@@ -49,17 +55,27 @@ module RubyNoteParser
     eval(code).to_s
   end
 
+  def modify_no_code(no_code)
+    # this is for 'StdLib::SpacingTools'
+    # OPTIMIZE replace with method not depending on AcrtiveSupport and one that doesn't delete the right whitespace
+    no_code = no_code.squish if @doc_state[:skip_next]
+    @doc_state[:skip_next] = false unless @doc_state[:super_skip]
+
+    # this is for 'docmode' from 'RNExtensions'
+    no_code = dehtmlize(no_code) if @doc_state[:is_plain]
+
+    no_code
+  end
+
   def render_note(text)
-    pattern = /(?<plain>([^%]|%%)*)%(?<code>[^%]([^;]|;[^;])*);;/
+    pattern = /(?<plain>([^%]|%%)*)%(?<code>[^%]([^;]|;[^;])*)?;;/
 
     res = ''
     last_pos = 0
     text.scan(pattern) do |mobj|
-      res += if @is_plain
-          dehtmlize(mobj[0])
-        else
-          mobj[0]
-             end
+      no_code = modify_no_code(mobj[0])
+
+      res += no_code
 
       res += rubify(mobj[1])
 
@@ -67,7 +83,7 @@ module RubyNoteParser
       last_pos = (bgn + (mobj[1].length + mobj[0].length) + 3)
     end
 
-    res + text[last_pos..]
+    res + modify_no_code(text[last_pos..]) # adds no-code from the end of file (with applied modify_no_code)
   end
 
   def dehtmlize(html)
@@ -86,7 +102,12 @@ class RubyNoteMehanics
 
   def initialize(note_str)
     @note_plain = note_str
-    @is_plain = false # for 'docmode' from RNExtensions
+    @doc_state = {
+      is_plain: false, # for 'docmode' from RNExtensions
+      skip_next: false, # for 'RNStdLib::SpaceTools'
+      super_skip: false, # same
+      pre: false # for RNStdlib's 'set_pre'
+    }
   end
 
   def preprocess
@@ -106,4 +127,15 @@ end
 # including standard library
 class RNBasicEnv < RubyNoteMehanics
   include RNStdlib
+
+  def initialize(note_str)
+    super
+    @doc_state[:pre] = true
+  end
+
+  def preprocess
+    super
+    @converted = '<pre>' + @converted # adds first 'pre' tag because of @pre = true (in initialize)
+    @converted += '</pre>' if @doc_state[:pre] # closes all opened 'pre'
+  end
 end

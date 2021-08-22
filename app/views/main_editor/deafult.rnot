@@ -1,6 +1,6 @@
 %docmode(:plain) # disables HTML;;
-%header(2, 'A Test of a RubyNote');;  <u>2+2 = %im(  'codify((2+2).to_s)'  );;</u>
-becomes: %docmode(:html);;
-  <u>2+2 = %codify((2+2).to_s);;</u>
+%header(2, 'A Test of a RubyNote');;  <u>2+2 = %im(  'codify((2+2).to_s)'  );;</u>          %s_br;;
+                                      becomes: %docmode(:html);;                            %s_br;;
+                 %'  ';;%s;;          <u>2+2 = %' ' + codify((2+2).to_s);;</u>
 
 We are using <b>RNStdlib</b> to write html into %enclose('i', 'pre');; element. Yay!
