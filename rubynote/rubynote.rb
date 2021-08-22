@@ -25,7 +25,7 @@ module RNExtensions
   # switches off\on html with :plain\:html
   def docmode(mode)
     @doc_state[:is_plain] = mode == :plain
-    noth # hides displaying
+    noth
   end
 
 end
@@ -68,7 +68,7 @@ module RubyNoteParser
   end
 
   def render_note(text)
-    pattern = /(?<plain>([^%]|%%)*)%(?<code>[^%]([^;]|;[^;])*)?;;/
+    pattern = /(?<plain>([^%]|%%)*)%(?<code>[^%]([^;]|;[^;])*);;/
 
     res = ''
     last_pos = 0
@@ -136,6 +136,6 @@ class RNBasicEnv < RubyNoteMehanics
   def preprocess
     super
     @converted = '<pre>' + @converted # adds first 'pre' tag because of @pre = true (in initialize)
-    @converted += '</pre>' if @doc_state[:pre] # closes all opened 'pre'
+    @converted += '</pre>' if @doc_state[:pre] # closes 'pre', but only if it was opened with 'set_pre'
   end
 end
