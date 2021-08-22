@@ -1,32 +1,42 @@
 # standard library
 module RNStdlib
+  # readable escape from parsing interpolation
+  def imitate_code(txt)
+    "%#{txt};;"
+  end
+  alias im imitate_code
 
-  def header(txt)
-    "<h1>#{txt}</h1>"
+  # header of any level with 1 as default
+  def header(level = 1, txt)
+    enclose("h#{level}", txt)
   end
 
-  def enclose(tag, txt = '', &block)
+  # puts txt in 'tag' param
+  def enclose(tag, txt = '')
     txtb = ''
-    txtb = block.call if block_given?
+    txtb = yield if block_given?
 
     l(tag) + txt + txtb + r(tag)
   end
 
+  # left tag
   def l(txt)
     "<#{txt}>"
   end
 
+  # right tag
   def r(txt)
     "</#{txt}>"
   end
 
-
+  # encloses in 'strong' tag
   def strong(txt)
-    '<strong>' + txt + '</strong>'
+    enclose('strong', txt)
   end
 
+  # encloses in 'code' tag
   def codify(txt)
-    '<code>' + txt + '</code>'
+    enclose('code', txt)
   end
 
 end

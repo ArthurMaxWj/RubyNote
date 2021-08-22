@@ -16,6 +16,12 @@ module RNExtensions
     end
   end
 
+  # switches off\on html with :plain\:html
+  def docmode(mode)
+    @is_plain = mode == :plain
+    nil # hides displaying
+  end
+
 end
 
 
@@ -49,7 +55,12 @@ module RubyNoteParser
     res = ''
     last_pos = 0
     text.scan(pattern) do |mobj|
-      res += mobj[0]
+      res += if @is_plain
+          dehtmlize(mobj[0])
+        else
+          mobj[0]
+             end
+
       res += rubify(mobj[1])
 
       bgn = Regexp.last_match.begin(1)
@@ -57,6 +68,10 @@ module RubyNoteParser
     end
 
     res + text[last_pos..]
+  end
+
+  def dehtmlize(html)
+    html.gsub('&', '&amp;').gsub('<', '&lt;').gsub('>', '&gt;')
   end
 
 end
@@ -71,11 +86,11 @@ class RubyNoteMehanics
 
   def initialize(note_str)
     @note_plain = note_str
+    @is_plain = false # for 'docmode' from RNExtensions
   end
 
   def preprocess
-    $RN_ENV = $RN_ENV || self # for RNSecurity's 'preapre' (recursive)
-    #$RN_ENV ||= self # for RNSecurity's 'preapre' (recursive)
+    $RN_ENV ||= self # for RNSecurity's 'preapre' (recursive)
     instance_exec(@converted, @note_plain) do
       @converted = render_note(@note_plain)
     end
