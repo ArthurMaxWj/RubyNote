@@ -1,7 +1,3 @@
-function htmlize(str) {
-    return str.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>')
-}
-
 preview = false;
 function toggleAjaxThing() {
     if (preview) {
@@ -15,9 +11,9 @@ function toggleAjaxThing() {
         inp = $('.textdiv .codearea').val();
 
         $.get( "/preprocess?code=ok", { 'code': inp}, function(data) {
-            // OPTIMIZE 'htmlize' shouldn't be need plus it affects the Ruby code as well
-           $(".textdiv .previewarea").html(htmlize(data['converted']));
+           $(".textdiv .previewarea").html('<pre>' + data['converted'] + '</pre>');
         }, 'json');
+
         $('.textdiv .previewarea').show();
     }
 }
