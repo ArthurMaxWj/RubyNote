@@ -106,7 +106,8 @@ class RubyNoteMehanics
       is_plain: false, # for 'docmode' from RNExtensions
       skip_next: false, # for 'RNStdLib::SpaceTools'
       super_skip: false, # same
-      pre: false # for RNStdlib's 'set_pre'
+      pre: false, # for RNStdlib's 'set_pre'
+      components: {} # empty components list for ::StdLib::ComponentsSupport
     }
   end
 

@@ -1,7 +1,29 @@
 %docmode(:plain) # disables HTML;;
-%header(2, 'A Test of a RubyNote');;%  (ss;'  ')  ;;
-            <u>2+2 = %' ' + im(  'codify((2+2).to_s)'  );;</u>        %br;;
+%header('A Test of a RubyNote');;
+%header(2, 'Tags and displaying');;%ss;;
+    %'  ';; <u>2+2 = %' ' + im(  'codify((2+2).to_s)'  );;</u>        %br;;
               becomes: %docmode(:html);;                              %br;;
     %'  ';; <u>2+2 = %' ' + codify((2+2).to_s);;</u>                  %br;;
 %se;;
-We are using <b>RNStdlib</b> to write html into %enclose('i', 'pre');; element. Yay!
+We are using <b>RNStdlib</b> to write html into %enclose('i', 'pre');; element. Yay!%s;;
+
+
+
+
+% (br*3) # ----------------------------------;;
+%ss;;
+%header(2, 'Components');;
+%component_new(                                      # creating a component
+         :list_of_named_things,
+  outer: ->(code){css('background-color: aliceblue;', code)},
+  inner: ->(hash){hash}                  # this is optonal, can be deleted
+) do |hash|
+  res = ''
+  hash.each do |key, val|
+    res += enclose('b', key.upcase + ': ') + val + br
+  end
+  res
+end
+
+component(:list_of_named_things, {'first name' => 'Artur', 'last name' => 'Wójcik'})      # reusing a component ;;
+%se;;
