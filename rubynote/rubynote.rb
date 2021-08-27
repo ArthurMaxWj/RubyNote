@@ -1,35 +1,5 @@
 require './rubynote/rnstdlib'
-
-module RNExtensions
-
-  # to be implemented overridden in subclasses, handles any 'err_type' symbols and 'msg'
-  def handle_error(err_type, msg = 'Undefined parser error')
-    "<div class='rn-error'>(#{err_type.to_s}): #{msg}</div>"
-  end
-
-  def error_found(err_type, msg = 'Undefined parser error')
-    case err_type
-    when :mod_add
-      "<div class='rn-error'>Failed at requiring module (:mod_add): #{msg}</div>"
-    else
-      handle_error(err_type, msg)
-    end
-  end
-
-  # hides displaying (basically just an internal abstraction for future)
-  def nothing_text
-    nil
-  end
-  alias noth nothing_text
-
-  # switches off\on html with :plain\:html
-  def docmode(mode)
-    @doc_state[:is_plain] = mode == :plain
-    noth
-  end
-
-end
-
+require './rubynote/rnextensions'
 
 module RNSecurity
 
@@ -50,6 +20,7 @@ module RNSecurity
 end
 
 module RubyNoteParser
+  include RNExtensions
 
   def rubify(code)
     eval(code).to_s
@@ -63,6 +34,10 @@ module RubyNoteParser
 
     # this is for 'docmode' from 'RNExtensions'
     no_code = dehtmlize(no_code) if @doc_state[:is_plain]
+
+    proc{RNExtension.all_extensions.each do |rex|
+      no_code = rex.transform(no_code)
+    end} #.
 
     no_code
   end
@@ -112,10 +87,12 @@ class RubyNoteMehanics
   end
 
   def preprocess
-    $RN_ENV ||= self # for RNSecurity's 'preapre' (recursive)
+    $RN_ENV ||= self # for RNSecurity's 'require' (recursive)
     instance_exec(@converted, @note_plain) do
       @converted = render_note(@note_plain)
     end
+    #. @converted = RNExtension.all_extensions.each(&:start).join + @converted
+    #. @converted += RNExtension.all_extensions.each(&:finish).join
   end
 
   def self.is_permitted?(mod)

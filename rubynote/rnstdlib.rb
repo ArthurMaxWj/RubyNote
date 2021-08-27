@@ -1,11 +1,15 @@
+require './rubynote/rnextensions'
+
 # standard library
 module RNStdlib
+  include ::RNExtensions
+  extend RExShort
 
   module Basic
     # used to manage both param textual values and blocks (concats them, handles empty)
-    def block_extract(value, &block)
+    def block_extract(value)
       if block_given?
-        value + block.call
+        value + yield
       else
         value
       end
@@ -19,8 +23,6 @@ module RNStdlib
 
     # puts txt in 'tag' param
     def enclose(tag, txt = '', &block)
-      #txtb = ''
-      #txtb = yield if block_given?
       txtbb = block_extract(txt, &block)
 
       l(tag) + txtbb + r(tag)
@@ -80,6 +82,68 @@ module RNStdlib
     end
   end
 
+  module ToDecompose
+
+    # to be implemented overridden in subclasses, handles any 'err_type' symbols and 'msg'
+    def handle_error(err_type, msg = 'Undefined parser error')
+      "<div class='rn-error'>(#{err_type.to_s}): #{msg}</div>"
+    end
+
+    def error_found(err_type, msg = 'Undefined parser error')
+      case err_type
+      when :mod_add
+        "<div class='rn-error'>Failed at requiring module (:mod_add): #{msg}</div>"
+      else
+        handle_error(err_type, msg)
+      end
+    end
+
+    # hides displaying (basically just an internal abstraction for future)
+    def nothing_text
+      nil
+    end
+    alias noth nothing_text
+
+    # switches off\on html with :plain\:html
+    def docmode(mode)
+      @doc_state[:is_plain] = mode == :plain
+      noth
+    end
+
+  end
+  include ::RNStdlib::ToDecompose
+
+
+  extension :set_pre do
+    def initialize(mod)
+      super(mod)
+      @pre = true
+    end
+
+    def start
+      '<pre>'
+    end
+
+    def finish
+      '</pre>' if @pre
+    end
+
+    export do
+      def set_pre(p)
+        return noth if @doc_state[:pre] == p
+
+        if p
+          @doc_state[:pre] = true
+          '<pre>'
+        else
+          @doc_state[:pre] = false
+          '</pre>'
+        end
+      end
+    end
+  end
+  include rex :set_pre
+  #. puts "[[:#{RNExtension.all_extensions}:]]"
 
 
   module SpacingTools
@@ -142,7 +206,7 @@ module RNStdlib
       inner ||= idnt
       outer ||= idnt
       @doc_state[:components][name] = proc { |val|
-        outer.( block.call(inner.(val)) )
+        outer.( yield(inner.(val)) )
       }
       noth
     end
